@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="StyleSheet" type="text/css" href="styles.css"/>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<script  src="questions.js" type="text/javascript"></script>
+		<script type="text/javascript">	
+		var q=0;          
+		var score=0;
+		var count = 0;    
+		var ctimer;		  
+		var rand = [];   
+		var counter=0;    
+		var index=0;
+        var topic="";
+		function validateChoice()
+		{			
+			hideAnimate();        
+			hideAnimateWrong();
+			var inputs = document.getElementsByName("rd");
+			var x=0;
+			var y=0;
+			if  (ques[index][q]["questionType"] == 1)
+			{
+				for (var i = 0; i < inputs.length; i++) 
+				{
+					if (inputs[i].checked) 
+					{	
+						y=1;
+						if(ques[index][q]["choices"][i]==ques[index][q]["correctChoice"])
+						{
+							score = score + 5;   
+							document.getElementById("scr").value = score;
+							showAnimate();		
+						}
+						else if(ques[index][q]["choices"][i]!=ques[index][q]["correctChoice"])
+						{
+							showAnimeWrong()
+						}
+						inputs[i].checked = false;
+					}
+							
+				}
+				if(!y) 
+				{
+					alert("Please select a choice");
+				}
+				else
+				{
+					countDownClear();	 
+					registerRandom();  
+				}
+					
+			}
+        
+			else if(ques[index][q]["questionType"]==2)
+			{
+				var ans = document.getElementById("txt1").value;
+				ans1 = ans.toUpperCase();
+				if (ans=="")
+				{
+					x=1;
+				}
+				else if( ans1 == ques[index][q]["correctAnswer"])
+				{
+					score = score + 5;
+					document.getElementById("scr").value = score;
+					showAnimate();
+				}
+				else if( ans1 != ques[index][q]["correctAnswer"])
+					{
+						showAnimeWrong();
+					}
+				document.getElementById("txt1").value="";				
+				if(x)
+				{
+					alert("Please type in an answer");
+				}
+				else
+				{
+					countDownClear();	
+					registerRandom();   
+				}
+			}
+					
+		}
+		
+		function showAnimate() 
+		{
+			document.getElementById("one").style.visibility="visible";
+				animateImage();		
+		}
+		
+		function animateImage() 
+		{
+			$('#one').toggle(5000,hideAnimate);
+		}
+		
+		function hideAnimate()
+		{
+			document.getElementById("one").style.visibility="hidden";
+		}
+		
+		function showAnimeWrong()
+		{
+			document.getElementById("two").style.visibility="visible";
+			animateImageWrong();	
+			
+		}
+		
+		function animateImageWrong()
+		{
+			$('#two').toggle(5000,hideAnimateWrong);
+		}
+		
+		function hideAnimateWrong()
+		{
+			document.getElementById("two").style.visibility="hidden";
+		}
+		
+		function generateRandomNum() 
+		{			
+			q= Math.floor((Math.random() *5));
+			for (i=0;i<11;i++)
+			{
+				if (q == rand[i]) 
+				{
+					generateRandomNum();
+				}
+				
+			}
+			rand.push(q);
+		}
+			
+        function myRandom() {
+        	
+    var rNo = Math.floor((Math.random() * 3) + 1);
+    var randomArray=[];
+    randomArray.push(rNo);
+    
+   if(rNo==1)
+       {
+           topic="Geography";
+           index=0;
+       }
+    else if(rNo==2)
+        {
+            topic="History";
+            index=1;
+        }
+    else if(rNo==3)
+        {
+            topic="Science";
+            index=2;
+        }
+            checkCookie();
+            registerRandom();
+         
+            document.getElementById("showTopic").innerHTML="Topic Of The Day :"+topic;
+}    
+            
+            
+          function setCookie(cname,cvalue,exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires=" + d.toGMTString();
+    document.cookie = cname+"="+cvalue+"; "+expires;
+}
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+function checkCookie() {
+    var user=getCookie("username");
+    if (user != "") {
+        alert("Welcome again " + user);
+    } else {
+       user = topic;
+       if (user != "" && user != null) {
+           setCookie("topic", topic, 1);
+       }
+    }
+}  
+            
+           
+		function registerRandom()
+		{ 
+			counter++;           
+            if(counter==6)
+			{
+				
+				completeQuiz();         
+			}
+            else
+			{
+				showRight();           
+				countDownStart();      
+				showControls();        
+				generateRandomNum();
+				showLeft();
+				if (ques[index][q]["questionType"] == 1)
+				{
+                   
+					$("#content-left").html("<h4>Hint: "+"<br/>"+ques[index][q]["hint"]+"<h4>");
+					var x=document.getElementById("question");
+                    x.innerHTML=ques[index][q]["question"];       
+                    hideText();
+                    showRadioChoice();                          
+                    showRadiobuttons();
+				} 
+				else if(ques[index][q]["questionType"]==2)
+				{
+                    $("#content-left").html("<h4>Hint: "+"<br/>"+ques[index][q]["hint"]+"<h4>");
+				
+					var x=document.getElementById("question"); 
+                    x.innerHTML=ques[index][q]["question"];
+                    hideChoice();
+                    showText();                               
+				}
+			}
+		}
+        function showRadiobuttons() 
+		{
+			document.getElementById("rad1").innerHTML = ques[index][q]["choices"][0];
+			document.getElementById("rad2").innerHTML = ques[index][q]["choices"][1];
+			document.getElementById("rad3").innerHTML = ques[index][q]["choices"][2];
+			document.getElementById("rad4").innerHTML = ques[index][q]["choices"][3];
+            
+			document.getElementById("rad1").value = ques[index][q]["choices"][0];
+			document.getElementById("rad2").value = ques[index][q]["choices"][1];
+			document.getElementById("rad3").value = ques[index][q]["choices"][2];
+			document.getElementById("rad4").value = ques[index][q]["choices"][3];
+        
+			return;
+		}
+		
+		function showControls() 
+		{
+			document.getElementById("b2").style.visibility="visible";
+			document.getElementById("b3").style.visibility="visible";
+		}
+			
+		function showRadioChoice()
+		{
+			document.getElementById("answer_choice").style.visibility="visible";
+		}
+			
+		function showText()
+		{
+			document.getElementById("answer_text").style.visibility="visible";
+		}
+		
+		function hideText()
+		{
+			document.getElementById("answer_text").style.visibility="hidden";
+		}
+		
+		function hideChoice()
+		{
+			document.getElementById("answer_choice").style.visibility="hidden";
+		}
+		
+		function showRight() 
+		{
+			document.getElementById("score").style.visibility="visible";
+			document.getElementById("timer").style.visibility="visible";
+		}
+		function showTimer()
+		{
+		}
+		function showLeft()
+		{
+			document.getElementById("content-left").style.visibility="visible";
+		}
+		function exitQuiz() 
+		{
+			var exit= document.getElementById("question");
+			document.getElementById("content-left").style.visibility="hidden";
+			document.getElementById("answer_text").style.visibility="hidden";
+			document.getElementById("answer_choice").style.visibility="hidden";
+			document.getElementById("score").style.visibility="hidden";
+			document.getElementById("timer").style.visibility="hidden";
+			document.getElementById("b2").style.visibility="hidden";
+			document.getElementById("b3").style.visibility="hidden";
+			document.getElementById("content-left").style.visibility="hidden";
+			document.getElementById("timer").style.visibility="hidden";
+			countDownClear();
+			exit.innerHTML="Sorry to see you go. Please refresh the page to start over again.";
+		}
+		
+		function completeQuiz() 
+		{
+			var score_exit;
+			document.getElementById("scr").value = score_exit;
+			$("#question").html("<h4>Congratulations!!! You have completed your Quiz! Your score is: "+score+"<h4>");
+			document.getElementById("content-left").style.visibility="hidden";
+			document.getElementById("answer_text").style.visibility="hidden";
+			document.getElementById("answer_choice").style.visibility="hidden";
+			document.getElementById("score").style.visibility="hidden";
+			document.getElementById("timer").style.visibility="hidden";
+			document.getElementById("b2").style.visibility="hidden";
+			document.getElementById("b3").style.visibility="hidden";
+			document.getElementById("content-left").style.visibility="hidden";
+			document.getElementById("timer").style.visibility="hidden";
+		}
+		
+		function countDownStart() 
+		{
+			count = 90;
+			countDownNow();
+		}
+		function countDownNow() 
+		{
+			if (count > 0)
+			{
+				--count;
+				$("#timer").html("<h3>Tick Tock: "+count+"<h3>");
+				if(count > 0) 
+				{
+					ctimer=setTimeout(countDownNow, 1000);
+				}
+			}
+			if(count==0) 
+			{
+				alert("You have ran out of time");
+				registerRandom();
+			}
+		}
+		function countDownClear() 
+		{
+			clearTimeout(ctimer);
+		}
+		
+		function setFocusButton(e)
+		{
+			if(e.keyCode == 13)
+			{
+				alert("inside focus");
+				validateChoice();
+			}
+			
+		}
+		
+	</script>		
+	</head>
+        <body>
+		
+			<div id="header">
+				
+				
+					<p id="showTopic" style="text-align:center;width:80%;margin-top:35px;margin-left:100px;font-size:30px;"><b>Quiz</b></p>
+					
+					
+			<div id="dt"> 
+					<script type = "text/javascript">                                   
+					var currentTime = new Date()
+					var month = currentTime.getMonth() + 1
+					var day = currentTime.getDate()
+					var year = currentTime.getFullYear()
+					var hours = currentTime.getHours();
+					
+					document.write("<h3>"+month + "/" + day + "/" + year +"</h3>" +"<h3>"+ hours + minutes);				
+					 
+					</script>
+				</div> 
+
+			  </div>
+			  <div id="content-left">
+					
+			</div>
+		    
+			<div id="content-right">                                                     
+				<div id="score">
+					<b>SCORE: </b> <input type="text" id="scr"  size="4" />
+				</div>					
+				<div id="timer">
+				  
+				</div>
+			</div>
+
+			<div id="content" style="height:400px;position:relative; float:left; left:200px; bottom:100px;">
+				<div id="question" >                  
+					<p style="font-size:30px;">Welcome to the Quiz! Please click start to begin.</p>
+					
+					<p style="font-size:20px;">You have 90 seconds to answer each question</p>
+					<input type="button" id="b1" value="START" class="btn" style="float:left;position:relative;left:200px;" onclick="myRandom();" />
+				</div>
+				<div id="answer_choice">                         
+					<form id="form1" action="">
+					<input type="radio" id="a1" name="rd" onclick="setFocusButton(event)" value="" /><label id="rad1"></label><br/>
+					<input type="radio" id="a2" name="rd" onclick="setFocusButton(event)" value="" /><label id="rad2"></label><br/>
+					<input type="radio" id="a3" name="rd" onclick="setFocusButton(event)" value="" /><label id="rad3"></label><br/>
+					<input type="radio" id="a4" name="rd" onclick="setFocusButton(event)" value="" /><label id="rad4"></label><br/>
+					</form>
+				</div>
+				<div id="answer_text">           
+					<form id="form2" action="">
+					<h3>Please write your answer here</h3> <input type="text" id="txt1" onclick="setFocusButton(event)" size="20" />
+					</form>
+				</div>
+				<div id ="controls">
+					
+				</div>
+				
+				<div id="controls1">     
+					<input type="button" style="border-radius:20px;"id="b2" value="NEXT" onclick="validateChoice();" onkeypress="validateChoice();" />
+					<input type="button" id="b3" value="EXIT"  style="float:right" onclick="exitQuiz();" />	
+				</div>
+				<div id="one" style="width:350px;height:75px;background-color:green"> 
+					<h3> Correct answer! Keep going</h3>
+				</div>
+				<div id="two"  style="width:600px;height:75px;background-color:red">
+					<h3> Sorry, Wrong Answer</h3>
+				</div>
+			</div>
+
+		
+			<div id="footer" style="height:35px;">       
+                <p style="font-size:20px;">© Malavika Iyer | Contact: miyer@scu.edu</p>
+			</div>			
+				
+        </body>
+</html>
